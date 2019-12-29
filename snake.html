@@ -18,10 +18,19 @@
 		var ctx=canvas.getContext("2d");
 		posx=canvas.width/2;
 		posy=canvas.width/2;
+		direction='S'
 		ctx.moveTo(posx,posy);
 
-		console.log('posx: ${posx}')
-		setInterval(() => move(null),1000);
+
+		console.log("adding listener....");
+		document.addEventListener("keydown",event => {
+			console.log(`key down: ${event.keyCode}`);
+		})
+
+		console.log(`posx: ${posx}`)
+		setInterval(() => move(),1000);
+
+
 
 	</script>
 </body>

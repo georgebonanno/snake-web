@@ -1,0 +1,28 @@
+<html>
+<body>
+
+	<canvas id="snakeGameCanvas" width="800" height="800" style="border:1px solid #000000;">
+
+	</canvas>
+	<script type="text/javascript">
+		
+		function move(direction) {
+			posy=posy+5;
+			ctx.lineTo(posx,posy+5);
+			ctx.moveTo(posx,posy);
+			console.log(`moving to ${posx},${posy}`)
+			ctx.stroke();
+		}
+
+		var canvas=document.getElementById('snakeGameCanvas');
+		var ctx=canvas.getContext("2d");
+		posx=canvas.width/2;
+		posy=canvas.width/2;
+		ctx.moveTo(posx,posy);
+
+		console.log('posx: ${posx}')
+		setInterval(() => move(null),1000);
+
+	</script>
+</body>
+</html>

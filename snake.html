@@ -5,47 +5,70 @@
 
 	</canvas>
 	<script type="text/javascript">
-		
-		function move(direction) {
-			ctx.clearRect(0,0,canvas.width,canvas.height);
-			ctx.beginPath();
-			ctx.moveTo(posx,posy);
 
-			var nposy=posy;
-			var nposx=posx;
+		class Snake {
 
-			switch (direction) {
-				case 'N':
-						nposy=posy-5;
-						break;
-				case 'S':
-						nposy=posy+5;
-						break;
-				case 'E':
-						nposx=posx-5;
-						break;
-				case 'W':
-						nposx=posx+5;
-						break;
-				default:
-						throw "undefined direction: "+direction;
+			constructor(initx,inity) {
+				this.posx = initx;
+				this.posy = inity;
+				this.direction='S';
 			}
-			ctx.lineTo(nposx,nposy);
-			ctx.moveTo(nposx,nposy);
-			console.log(`moving to ${posx},${posy} -> ${nposx},${nposy}`)
-			posx=nposx;
-			posy=nposy;
-			
-			ctx.stroke();
+
+			move() {
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				ctx.beginPath();
+				ctx.moveTo(this.posx,this.posy);
+				ctx.fillRect(randomPt.x,randomPt.y,5,5);
+
+				var nposy=this.posy;
+				var nposx=this.posx;
+
+				switch (direction) {
+					case 'N':
+							nposy=this.posy-10;
+							break;
+					case 'S':
+							nposy=this.posy+10;
+							break;
+					case 'E':
+							nposx=this.posx-10;
+							break;
+					case 'W':
+							nposx=this.posx+10;
+							break;
+					default:
+							throw "undefined direction: "+direction;
+				}
+				ctx.lineTo(nposx,nposy);
+				ctx.moveTo(nposx,nposy);
+				console.log(`moving to ${this.posx},${this.posy} -> ${nposx},${nposy}`)
+				this.posx=nposx;
+				this.posy=nposy;
+				
+				ctx.stroke();
+			}
 		}
+
+		function randomPoint(rangex,rangey) {
+			return {
+				x: Math.floor(Math.random()*rangex),
+				y: Math.floor(Math.random()*rangey)
+			};
+		}
+		
+		
 
 		var canvas=document.getElementById('snakeGameCanvas');
 		var ctx=canvas.getContext("2d");
-		posx=canvas.width/2;
-		posy=canvas.width/2;
-		direction='S'
-		ctx.moveTo(posx,posy);
+		ctx.lineWidth = 5;
 
+
+		var randomPt=randomPoint(canvas.width,canvas.height);
+
+
+		direction='S'
+
+		var snake = new Snake(canvas.width/2,canvas.height/2);
 
 		console.log("adding listener....");
 		document.addEventListener("keydown",event => {
@@ -77,8 +100,8 @@
 			console.log(`new direction: ${direction}`);
 		})
 
-		console.log(`posx: ${posx}`)
-		setInterval(() => move(direction),100);
+		//console.log(`posx: ${posx}`)
+		setInterval(() => snake.move(direction),100);
 
 
 

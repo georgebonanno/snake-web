@@ -7,9 +7,29 @@
 	<script type="text/javascript">
 		
 		function move(direction) {
-			posy=posy+5;
-			ctx.lineTo(posx,posy+5);
 			ctx.moveTo(posx,posy);
+			var nposy=posy;
+			var nposx=posx;
+			switch (direction) {
+				case 'N':
+						nposy=posy-5;
+						break;
+				case 'S':
+						nposy=posy+5;
+						break;
+				case 'E':
+						nposx=posx-5;
+						break;
+				case 'W':
+						nposx=posx+5;
+						break;
+				default:
+						throw "undefined direction: "+direction;
+			}
+			ctx.lineTo(nposx,nposy);
+			ctx.moveTo(nposx,nposy);
+			posx=nposx;
+			posy=nposy;
 			console.log(`moving to ${posx},${posy}`)
 			ctx.stroke();
 		}
@@ -25,10 +45,35 @@
 		console.log("adding listener....");
 		document.addEventListener("keydown",event => {
 			console.log(`key down: ${event.keyCode}`);
+			switch (event.keyCode) {
+				case 38:
+					if (direction != 'S') {
+						direction = 'N';
+					}	
+					break;
+				case 39:
+					if (direction != 'E') {
+						direction = 'W';
+					}
+					break;
+				case 40:
+					if (direction != 'N') {
+						direction = 'S';
+					}
+					break;
+				case 37:
+					if (direction != 'W') {
+						direction = 'E';
+					}
+					break;
+				default:
+					break;
+			};
+			console.log(`new direction: ${direction}`);
 		})
 
 		console.log(`posx: ${posx}`)
-		setInterval(() => move(),1000);
+		setInterval(() => move(direction),100);
 
 
 

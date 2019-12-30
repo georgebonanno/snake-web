@@ -7,9 +7,13 @@
 	<script type="text/javascript">
 		
 		function move(direction) {
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			ctx.beginPath();
 			ctx.moveTo(posx,posy);
+
 			var nposy=posy;
 			var nposx=posx;
+
 			switch (direction) {
 				case 'N':
 						nposy=posy-5;
@@ -28,9 +32,10 @@
 			}
 			ctx.lineTo(nposx,nposy);
 			ctx.moveTo(nposx,nposy);
+			console.log(`moving to ${posx},${posy} -> ${nposx},${nposy}`)
 			posx=nposx;
 			posy=nposy;
-			console.log(`moving to ${posx},${posy}`)
+			
 			ctx.stroke();
 		}
 

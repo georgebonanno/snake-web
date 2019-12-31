@@ -6,57 +6,153 @@
 	</canvas>
 	<script type="text/javascript">
 
+		class Line {
+			constructor(xStart,yStart,xEnd,yEnd) {
+				this.xStart=xStart;
+				this.yStart=yStart;
+				this.xEnd=xEnd;
+				this.yEnd=yEnd;
+			}
+		}
+
 		class Snake {
 
 			constructor(initx,inity) {
-				this.posx = initx;
-				this.posy = inity;
 				this.direction='S';
+				this.lines=[new Line(initx,inity,initx,inity+10)];
+			}
+
+			getFirstLine() {
+				var firstLine=this.lines[this.lines.length-1];
+				return firstLine;
+			}
+
+			changeDirection(newDirection) {
+				var firstLine=this.getFirstLine();
+				var newLine=new Line(firstLine.xEnd,firstLine.yEnd,firstLine.xEnd,firstLine.yEnd);
+				this.lines.push(newLine);
+				this.direction=newDirection;
+			}
+
+			moveLine(firstLine,direction) {
+				var posy=firstLine.yEnd;
+				var posx=firstLine.xEnd;
+				var nposy=posy;
+				var nposx=posx;
+
+				switch (direction) {
+					case 'N':
+							nposy=posy-10;
+							break;
+					case 'S':
+							nposy=posy+10;
+							break;
+					case 'E':
+							nposx=posx-10;
+							break;
+					case 'W':
+							nposx=posx+10;
+							break;
+					default:
+							throw "undefined direction: "+direction;
+				}
+				firstLine.xEnd=nposx;
+				firstLine.yEnd=nposy;
+				return firstLine;
+			}
+
+			hasEaten() {
+				var firstLine=this.getFirstLine();
+				console.log("check if has eaten...");
+				var xEnd=firstLine.xEnd;
+				var yEnd=firstLine.yEnd;
+				var inArea = randomPt.isPointInArea(xEnd,yEnd);
+
+				console.log(`inArea: ${inArea}`);
+				return inArea;
+			}
+
+			increaseLine(firstLine,size,end) {
+				if (firstLine.xStart == firstLine.xEnd) {
+					if (end) {
+						firstLine.yEnd = firstLine.yEnd+size;
+					} else {
+						firstLine.yStart= firstLine.yStart+size;
+					}
+				} 
+				if (firstLine.yStart == firstLine.yEnd) {
+					if (end) {
+						firstLine.xEnd = firstLine.xEnd+size;
+					} else {
+						firstLine.xStart= firstLine.xStart+size;
+					}
+				} 
+				
+			}
+
+			removeTrailing(lastLine,previousLine) {
+				console.log("remove trailing....dsfsdf");
+				if (lastLine.xEnd == previousLine.xStart &&
+						lastLine.yEnd == previousLine.yStart) {
+					console.log("removing line...");
+					this.lines.splice(0,1);
+				}
 			}
 
 			move() {
 				ctx.clearRect(0,0,canvas.width,canvas.height);
 				ctx.beginPath();
-				ctx.moveTo(this.posx,this.posy);
-				ctx.fillRect(randomPt.x,randomPt.y,5,5);
+				ctx.fillRect(randomPt.x,randomPt.y,randomPt.sideLength,randomPt.sideLength);
 
-				var nposy=this.posy;
-				var nposx=this.posx;
+				var firstLine=this.lines[this.lines.length-1];
+				var lastLine=this.lines[0];
+				this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
+				this.increaseLine(lastLine,10,false);
 
-				switch (direction) {
-					case 'N':
-							nposy=this.posy-10;
-							break;
-					case 'S':
-							nposy=this.posy+10;
-							break;
-					case 'E':
-							nposx=this.posx-10;
-							break;
-					case 'W':
-							nposx=this.posx+10;
-							break;
-					default:
-							throw "undefined direction: "+direction;
+				if (this.lines.length >= 2) {
+					console.log("remove trailing")
+					this.removeTrailing(this.lines[this.lines.length-1],this.lines[this.lines.length-2]);
 				}
-				ctx.lineTo(nposx,nposy);
-				ctx.moveTo(nposx,nposy);
-				console.log(`moving to ${this.posx},${this.posy} -> ${nposx},${nposy}`)
-				this.posx=nposx;
-				this.posy=nposy;
-				
-				ctx.stroke();
+
+				if (this.hasEaten()) {
+					console.log("eaten!!!!");
+					this.increaseLine(firstLine,10);	
+				}
+
+				this.lines.forEach(line => {
+					ctx.moveTo(line.xStart,line.yStart);
+					ctx.lineTo(line.xEnd,line.yEnd);
+					ctx.moveTo(line.xEnd,line.yEnd);
+					ctx.stroke();
+					console.log(`moving to ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
+				});
 			}
+
+
 		}
 
 		function randomPoint(rangex,rangey) {
 			return {
 				x: Math.floor(Math.random()*rangex),
-				y: Math.floor(Math.random()*rangey)
+				y: Math.floor(Math.random()*rangey),
+				sideLength:10,
+				isPointInArea: function(pointx,pointy) {
+					console.log(`isPointInArea for ${pointx},${pointy} for ${this.x},${this.y}`);
+					return pointInArea(pointx,pointy,this.x,this.y,this.x+this.sideLength,this.y+this.sideLength);
+				}
 			};
 		}
 		
-		
+		function isBetween(n,nsmall,nlarge) {
+			console.log(`n: ${n} in range ${nsmall} to ${nlarge}`);
+			var between=(n >= nsmall) && (n <= nlarge);
+			return between;
+		}
+
+		function pointInArea(x,y,topLeftCornerX,topLeftCornerY,bottomRightCornerX,bottomRightCornerY) {
+			return isBetween(x,topLeftCornerX,bottomRightCornerX) &&
+					isBetween(y,topLeftCornerY,bottomRightCornerY);
+		}
 
 		var canvas=document.getElementById('snakeGameCanvas');
 		var ctx=canvas.getContext("2d");
@@ -97,6 +193,7 @@
 				default:
 					break;
 			};
+			snake.changeDirection(direction);
 			console.log(`new direction: ${direction}`);
 		})
 

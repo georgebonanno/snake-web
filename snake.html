@@ -1,7 +1,7 @@
 <html>
 <body>
 
-	<canvas id="snakeGameCanvas" width="800" height="800" style="border:1px solid #000000;">
+	<canvas id="snakeGameCanvas" width="400" height="400" style="border:1px solid #000000;">
 
 	</canvas>
 	<script type="text/javascript">
@@ -13,6 +13,10 @@
 				this.xEnd=xEnd;
 				this.yEnd=yEnd;
 			}
+
+			describe() {
+				return `(${this.xStart},${this.yStart}) -> (${this.xEnd},${this.yEnd})`;
+			}
 		}
 
 		class Snake {
@@ -20,6 +24,7 @@
 			constructor(initx,inity) {
 				this.direction='S';
 				this.lines=[new Line(initx,inity,initx,inity+10)];
+				this.totalLength=10;
 			}
 
 			getFirstLine() {
@@ -75,23 +80,39 @@
 			increaseLine(firstLine,size,end) {
 				if (firstLine.xStart == firstLine.xEnd) {
 					if (end) {
-						firstLine.yEnd = firstLine.yEnd+size;
+						if (firstLine.yEnd < firstLine.yStart) {
+							firstLine.yEnd=firstLine.yEnd-size;	
+						} else {
+							firstLine.yEnd=firstLine.yEnd+size;
+						}
 					} else {
-						firstLine.yStart= firstLine.yStart+size;
+						if (firstLine.yEnd < firstLine.yStart) {
+							firstLine.yStart=firstLine.yStart-size;	
+						} else {
+							firstLine.yStart=firstLine.yStart+size;
+						}
 					}
 				} 
 				if (firstLine.yStart == firstLine.yEnd) {
 					if (end) {
-						firstLine.xEnd = firstLine.xEnd+size;
+						if (firstLine.xEnd < firstLine.xStart) {
+							firstLine.xEnd=firstLine.xEnd-size;	
+						} else {
+							firstLine.xEnd=firstLine.xEnd+size;
+						}
 					} else {
-						firstLine.xStart= firstLine.xStart+size;
+						if (firstLine.xEnd < firstLine.xStart) {
+							firstLine.xStart=firstLine.xStart-size;	
+						} else {
+							firstLine.xStart=firstLine.xStart+size;
+						}
 					}
 				} 
 				
 			}
 
 			removeTrailing(lastLine,previousLine) {
-				console.log("remove trailing....dsfsdf");
+				console.log(`remove trailing....${lastLine.describe()} and ${previousLine.describe()}`);
 				if (lastLine.xEnd == previousLine.xStart &&
 						lastLine.yEnd == previousLine.yStart) {
 					console.log("removing line...");
@@ -99,33 +120,46 @@
 				}
 			}
 
+			scalar(val) {
+				return val > 0 ? val : val*-1;
+			}
+
 			move() {
-				ctx.clearRect(0,0,canvas.width,canvas.height);
-				ctx.beginPath();
-				ctx.fillRect(randomPt.x,randomPt.y,randomPt.sideLength,randomPt.sideLength);
+				
 
 				var firstLine=this.lines[this.lines.length-1];
 				var lastLine=this.lines[0];
-				this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
-				this.increaseLine(lastLine,10,false);
+				var outOfBounds=
+					this.scalar(firstLine.xEnd)  > 400 || this.scalar(firstLine.yEnd) > 400;
+				if (!(outOfBounds)) {
+					
+					this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
+					this.increaseLine(lastLine,10,false);
 
-				if (this.lines.length >= 2) {
-					console.log("remove trailing")
-					this.removeTrailing(this.lines[this.lines.length-1],this.lines[this.lines.length-2]);
+					if (this.lines.length >= 2) {
+						console.log("remove trailing")
+						this.removeTrailing(this.lines[0],this.lines[1]);
+					}
+
+					if (this.hasEaten()) {
+						console.log("eaten!!!!");
+						this.increaseLine(firstLine,10,true);	
+						this.totalLength = this.totalLength+10;
+					}
+				
+
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					ctx.beginPath();
+					ctx.fillRect(randomPt.x,randomPt.y,randomPt.sideLength,randomPt.sideLength);
+					
+					this.lines.forEach(line => {
+						ctx.moveTo(line.xStart,line.yStart);
+						ctx.lineTo(line.xEnd,line.yEnd);
+						ctx.moveTo(line.xEnd,line.yEnd);
+						ctx.stroke();
+						console.log(`moving to ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
+					});
 				}
-
-				if (this.hasEaten()) {
-					console.log("eaten!!!!");
-					this.increaseLine(firstLine,10);	
-				}
-
-				this.lines.forEach(line => {
-					ctx.moveTo(line.xStart,line.yStart);
-					ctx.lineTo(line.xEnd,line.yEnd);
-					ctx.moveTo(line.xEnd,line.yEnd);
-					ctx.stroke();
-					console.log(`moving to ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
-				});
 			}
 
 
@@ -198,10 +232,10 @@
 		})
 
 		//console.log(`posx: ${posx}`)
-		setInterval(() => snake.move(direction),100);
+		var interval=setInterval(() => snake.move(direction),100);
 
 
 
 	</script>
 </body>
-</html>
+</html>G

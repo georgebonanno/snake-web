@@ -37,6 +37,7 @@
 				var newLine=new Line(firstLine.xEnd,firstLine.yEnd,firstLine.xEnd,firstLine.yEnd);
 				this.lines.push(newLine);
 				this.direction=newDirection;
+				console.log(`change direction to ${newDirection}`);
 			}
 
 			moveLine(firstLine,direction) {
@@ -78,6 +79,7 @@
 			}
 
 			increaseLine(firstLine,size,end) {
+				console.log(`increaseLine ${firstLine.describe()}`);
 				if (firstLine.xStart == firstLine.xEnd) {
 					if (end) {
 						if (firstLine.yEnd < firstLine.yStart) {
@@ -92,8 +94,7 @@
 							firstLine.yStart=firstLine.yStart+size;
 						}
 					}
-				} 
-				if (firstLine.yStart == firstLine.yEnd) {
+				} else if (firstLine.yStart == firstLine.yEnd) {
 					if (end) {
 						if (firstLine.xEnd < firstLine.xStart) {
 							firstLine.xEnd=firstLine.xEnd-size;	
@@ -108,13 +109,13 @@
 						}
 					}
 				} 
-				
+				console.log(`increaseLine updated ${firstLine.describe()}`);
 			}
 
 			removeTrailing(lastLine,previousLine) {
 				console.log(`remove trailing....${lastLine.describe()} and ${previousLine.describe()}`);
-				if (lastLine.xEnd == previousLine.xStart &&
-						lastLine.yEnd == previousLine.yStart) {
+				if (lastLine.xEnd == lastLine.xStart &&
+						lastLine.yEnd == lastLine.yStart) {
 					console.log("removing line...");
 					this.lines.splice(0,1);
 				}
@@ -139,12 +140,16 @@
 					if (this.lines.length >= 2) {
 						console.log("remove trailing")
 						this.removeTrailing(this.lines[0],this.lines[1]);
+						/*if (this.lines.length >= 2) {
+							this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
+						}*/
 					}
 
 					if (this.hasEaten()) {
 						console.log("eaten!!!!");
 						this.increaseLine(firstLine,10,true);	
 						this.totalLength = this.totalLength+10;
+						randomPt=randomPoint(canvas.width,canvas.height);												
 					}
 				
 
@@ -157,7 +162,7 @@
 						ctx.lineTo(line.xEnd,line.yEnd);
 						ctx.moveTo(line.xEnd,line.yEnd);
 						ctx.stroke();
-						console.log(`moving to ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
+						console.log(`drawing ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
 					});
 				}
 			}
@@ -232,7 +237,7 @@
 		})
 
 		//console.log(`posx: ${posx}`)
-		var interval=setInterval(() => snake.move(direction),100);
+		var interval=setInterval(() => snake.move(direction),200);
 
 
 

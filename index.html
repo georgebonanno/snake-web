@@ -1,0 +1,246 @@
+<html>
+<body>
+
+	<canvas id="snakeGameCanvas" width="400" height="400" style="border:1px solid #000000;">
+
+	</canvas>
+	<script type="text/javascript">
+
+		class Line {
+			constructor(xStart,yStart,xEnd,yEnd) {
+				this.xStart=xStart;
+				this.yStart=yStart;
+				this.xEnd=xEnd;
+				this.yEnd=yEnd;
+			}
+
+			describe() {
+				return `(${this.xStart},${this.yStart}) -> (${this.xEnd},${this.yEnd})`;
+			}
+		}
+
+		class Snake {
+
+			constructor(initx,inity) {
+				this.direction='S';
+				this.lines=[new Line(initx,inity,initx,inity+10)];
+				this.totalLength=10;
+			}
+
+			getFirstLine() {
+				var firstLine=this.lines[this.lines.length-1];
+				return firstLine;
+			}
+
+			changeDirection(newDirection) {
+				var firstLine=this.getFirstLine();
+				var newLine=new Line(firstLine.xEnd,firstLine.yEnd,firstLine.xEnd,firstLine.yEnd);
+				this.lines.push(newLine);
+				this.direction=newDirection;
+				console.log(`change direction to ${newDirection}`);
+			}
+
+			moveLine(firstLine,direction) {
+				var posy=firstLine.yEnd;
+				var posx=firstLine.xEnd;
+				var nposy=posy;
+				var nposx=posx;
+
+				switch (direction) {
+					case 'N':
+							nposy=posy-10;
+							break;
+					case 'S':
+							nposy=posy+10;
+							break;
+					case 'E':
+							nposx=posx-10;
+							break;
+					case 'W':
+							nposx=posx+10;
+							break;
+					default:
+							throw "undefined direction: "+direction;
+				}
+				firstLine.xEnd=nposx;
+				firstLine.yEnd=nposy;
+				return firstLine;
+			}
+
+			hasEaten() {
+				var firstLine=this.getFirstLine();
+				console.log("check if has eaten...");
+				var xEnd=firstLine.xEnd;
+				var yEnd=firstLine.yEnd;
+				var inArea = randomPt.isPointInArea(xEnd,yEnd);
+
+				console.log(`inArea: ${inArea}`);
+				return inArea;
+			}
+
+			increaseLine(firstLine,size,end) {
+				console.log(`increaseLine ${firstLine.describe()}`);
+				if (firstLine.xStart == firstLine.xEnd) {
+					if (end) {
+						if (firstLine.yEnd < firstLine.yStart) {
+							firstLine.yEnd=firstLine.yEnd-size;	
+						} else {
+							firstLine.yEnd=firstLine.yEnd+size;
+						}
+					} else {
+						if (firstLine.yEnd < firstLine.yStart) {
+							firstLine.yStart=firstLine.yStart-size;	
+						} else {
+							firstLine.yStart=firstLine.yStart+size;
+						}
+					}
+				} else if (firstLine.yStart == firstLine.yEnd) {
+					if (end) {
+						if (firstLine.xEnd < firstLine.xStart) {
+							firstLine.xEnd=firstLine.xEnd-size;	
+						} else {
+							firstLine.xEnd=firstLine.xEnd+size;
+						}
+					} else {
+						if (firstLine.xEnd < firstLine.xStart) {
+							firstLine.xStart=firstLine.xStart-size;	
+						} else {
+							firstLine.xStart=firstLine.xStart+size;
+						}
+					}
+				} 
+				console.log(`increaseLine updated ${firstLine.describe()}`);
+			}
+
+			removeTrailing(lastLine,previousLine) {
+				console.log(`remove trailing....${lastLine.describe()} and ${previousLine.describe()}`);
+				if (lastLine.xEnd == lastLine.xStart &&
+						lastLine.yEnd == lastLine.yStart) {
+					console.log("removing line...");
+					this.lines.splice(0,1);
+				}
+			}
+
+			scalar(val) {
+				return val > 0 ? val : val*-1;
+			}
+
+			move() {
+				
+
+				var firstLine=this.lines[this.lines.length-1];
+				var lastLine=this.lines[0];
+				var outOfBounds=
+					this.scalar(firstLine.xEnd)  > 400 || this.scalar(firstLine.yEnd) > 400;
+				if (!(outOfBounds)) {
+					
+					this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
+					this.increaseLine(lastLine,10,false);
+
+					if (this.lines.length >= 2) {
+						console.log("remove trailing")
+						this.removeTrailing(this.lines[0],this.lines[1]);
+						/*if (this.lines.length >= 2) {
+							this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
+						}*/
+					}
+
+					if (this.hasEaten()) {
+						console.log("eaten!!!!");
+						this.increaseLine(firstLine,10,true);	
+						this.totalLength = this.totalLength+10;
+						randomPt=randomPoint(canvas.width,canvas.height);												
+					}
+				
+
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					ctx.beginPath();
+					ctx.fillRect(randomPt.x,randomPt.y,randomPt.sideLength,randomPt.sideLength);
+					
+					this.lines.forEach(line => {
+						ctx.moveTo(line.xStart,line.yStart);
+						ctx.lineTo(line.xEnd,line.yEnd);
+						ctx.moveTo(line.xEnd,line.yEnd);
+						ctx.stroke();
+						console.log(`drawing ${line.xStart},${line.yStart} -> ${line.xEnd},${line.yEnd}`);
+					});
+				}
+			}
+
+
+		}
+
+		function randomPoint(rangex,rangey) {
+			return {
+				x: Math.floor(Math.random()*rangex),
+				y: Math.floor(Math.random()*rangey),
+				sideLength:10,
+				isPointInArea: function(pointx,pointy) {
+					console.log(`isPointInArea for ${pointx},${pointy} for ${this.x},${this.y}`);
+					return pointInArea(pointx,pointy,this.x,this.y,this.x+this.sideLength,this.y+this.sideLength);
+				}
+			};
+		}
+		
+		function isBetween(n,nsmall,nlarge) {
+			console.log(`n: ${n} in range ${nsmall} to ${nlarge}`);
+			var between=(n >= nsmall) && (n <= nlarge);
+			return between;
+		}
+
+		function pointInArea(x,y,topLeftCornerX,topLeftCornerY,bottomRightCornerX,bottomRightCornerY) {
+			return isBetween(x,topLeftCornerX,bottomRightCornerX) &&
+					isBetween(y,topLeftCornerY,bottomRightCornerY);
+		}
+
+		var canvas=document.getElementById('snakeGameCanvas');
+		var ctx=canvas.getContext("2d");
+		ctx.lineWidth = 5;
+
+
+		var randomPt=randomPoint(canvas.width,canvas.height);
+
+
+		direction='S'
+
+		var snake = new Snake(canvas.width/2,canvas.height/2);
+
+		console.log("adding listener....");
+		document.addEventListener("keydown",event => {
+			console.log(`key down: ${event.keyCode}`);
+			switch (event.keyCode) {
+				case 38:
+					if (direction != 'S') {
+						direction = 'N';
+					}	
+					break;
+				case 39:
+					if (direction != 'E') {
+						direction = 'W';
+					}
+					break;
+				case 40:
+					if (direction != 'N') {
+						direction = 'S';
+					}
+					break;
+				case 37:
+					if (direction != 'W') {
+						direction = 'E';
+					}
+					break;
+				default:
+					break;
+			};
+			snake.changeDirection(direction);
+			console.log(`new direction: ${direction}`);
+		})
+
+		//console.log(`posx: ${posx}`)
+		var interval=setInterval(() => snake.move(direction),200);
+
+
+
+	</script>
+</body>
+</html>G

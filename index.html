@@ -1,9 +1,58 @@
 <html>
+	<head>
+		<meta name=”viewport” content=”width=device-width, initial-scale=1″>
+	</head>
 <body>
+	<div style="margin:0px;width:302px;display: block; margin: 0px;overflow: hidden;">
+		<div style="text-align: center;">
+			Is-Serp
+		</div>
+		<div class="col-">
+			<canvas id="snakeGameCanvas" width="300" height="300" style="border:1px solid #000000;">
+				<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+			</canvas>
+		</div>
+	</div>
+	<div style="width:300px;display: block; margin: 0px;overflow: hidden;">
+		<div style="width:33%;float:left;">
+			&nbsp;
+		</div>
+		<div style="width:33%;float:left;">
+			<span id="upButton" class="btn btn-primary" style="width:100%;">Up</span>
+		</div>
+		<div style="width:33%;float:left;">
+			&nbsp;
+		</div>
+	</div>
+	<div style="width:300px;display: block; margin: 0px;overflow: hidden;">
+		<div style="width:25%;float:left;align-items: flex-end;">
+			&nbsp;
+		</div>
+		<div style="width:25%;float:left;align-items: flex-end;">
+			<button id="leftButton" type="button" style="float:right;width: 100%;" class="btn btn-primary">Left</button>
+		</div>
+		<div style="width:25%;float:left;">
+			<button id="rightButton" type="button" style="width: 100%;" class="btn btn-primary">Right</button>
+		</div>
+		<div style="width:25%;float:left;align-items: flex-end;">
+			&nbsp;
+		</div>
+	</div>
+	<div style="width:300px;display: block; margin: 0px;overflow: hidden;">
+		<div style="width:33%;float:left;">
+			&nbsp;
+		</div>
+		<div style="width:33%;float:left;">
+			<span id="downButton" class="btn btn-primary" style="width:100%;">Down</span>
+		</div>
+		<div style="width:33%;float:left;">
+			&nbsp;
+		</div>
+	</div>
 
-	<canvas id="snakeGameCanvas" width="400" height="400" style="border:1px solid #000000;">
-
-	</canvas>
+		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	<script type="text/javascript">
 
 		class Line {
@@ -140,9 +189,6 @@
 					if (this.lines.length >= 2) {
 						console.log("remove trailing")
 						this.removeTrailing(this.lines[0],this.lines[1]);
-						/*if (this.lines.length >= 2) {
-							this.lines[this.lines.length-1]=this.moveLine(firstLine,this.direction);
-						}*/
 					}
 
 					if (this.hasEaten()) {
@@ -235,6 +281,30 @@
 			snake.changeDirection(direction);
 			console.log(`new direction: ${direction}`);
 		})
+		document.getElementById('leftButton').addEventListener('click',event => {
+			if (direction != 'W') {
+				direction = 'E';
+			}
+			snake.changeDirection(direction);
+		});
+		document.getElementById('rightButton').addEventListener('click',event => {
+			if (direction != 'E') {
+				direction = 'W';
+			}
+			snake.changeDirection(direction);
+		});
+		document.getElementById('upButton').addEventListener('click',event => {
+			if (direction != 'S') {
+				direction = 'N';
+			}
+			snake.changeDirection(direction);
+		});
+		document.getElementById('downButton').addEventListener('click',event => {
+			if (direction != 'N') {
+				direction = 'S';
+			}
+			snake.changeDirection(direction);
+		});
 
 		//console.log(`posx: ${posx}`)
 		var interval=setInterval(() => snake.move(direction),200);
@@ -242,5 +312,6 @@
 
 
 	</script>
+	 
 </body>
-</html>G
+</html>

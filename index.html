@@ -9,6 +9,9 @@
 		<div style="text-align: center;font-weight: bold;font-size: 16;">
 			Is-Serp
 		</div>
+		<div style="text-align: center;font-weight: bold;font-size: 12;">
+			<a href="javascript:reset()" >reset</a>
+		</div>
 		<div style="width: 100%;" class="col-">
 			<canvas id="snakeGameCanvas" width="100%" height="50%" style="border:1px solid #000000;">
 				
@@ -66,10 +69,20 @@
 
 		class Snake {
 
-			constructor(initx,inity) {
+			init() {
 				this.direction='S';
-				this.lines=[new Line(initx,inity,initx,inity+10)];
+				this.lines=[new Line(this.initx,this.inity,this.initx,this.inity+10)];
 				this.totalLength=10;
+			}
+
+			reset() {
+				this.init();
+			}
+
+			constructor(initx,inity) {
+				this.initx=initx;
+				this.inity=inity;
+				this.init();
 			}
 
 			getFirstLine() {
@@ -316,6 +329,9 @@
 		
 		var interval=setInterval(() => snake.move(direction),200);
 
+		function reset() {
+			snake.reset();	
+		}
 
 	</script>
 	 
